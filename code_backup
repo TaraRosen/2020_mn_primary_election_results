@@ -1,0 +1,54 @@
+import requests
+from bs4 import BeautifulSoup
+
+#response = get('https://electionresults.sos.state.mn.us/Results/PrecinctListResults/115?countyid=' + countyid + '&precincts=' + precincts)
+
+# solve for one: return webpage html to get precinct codes for a single county - Aitkin
+
+url = "https://electionresults.sos.state.mn.us/Select/Precinct/Index?ErsElectionId=115&Id=county&CountyId=1"
+page = requests.get(url)
+soup = BeautifulSoup(page.content, 'html.parser')
+soup
+
+# solve for one: return precinct html for aitkin county
+
+precincts = soup.find(id = "selectprecincts")
+precincts
+
+# solve for one: return precinct url code and precinct for aitkin county
+
+precinct_list = []
+
+for option in soup.find_all('option'):
+    precinct_list.append([option['value'], option.text])
+    print(option['value'], option.text)
+    
+# solve for one: return precinct text from html
+
+for precinct in precincts.stripped_strings:
+    print(precinct)
+    
+precinct_code = precincts.attrs
+precinct_code
+
+# solve for all: create url county_id list to iterate through to find all precinct ids
+
+urls = [] 
+county_id = 1
+
+for x in range(1, 88):
+    url = "https://electionresults.sos.state.mn.us/Select/Precinct/Index?ErsElectionId=115&Id=county&CountyId=" + str(x)
+    urls.append(url)
+    
+# create list of all precinct ids to iterate through to return each precincts returns
+
+precinct_list = []
+
+for url in urls:
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    
+    for option in soup.find_all('option'):
+        precinct_list.append([option['value'], option.text])
+        
+precinct_list
