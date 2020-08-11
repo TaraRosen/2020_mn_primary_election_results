@@ -52,3 +52,58 @@ for url in urls:
         precinct_list.append([option['value'], option.text])
         
 precinct_list
+
+
+
+
+# solve for one: return webpage html to get election results for a single county - Aitkin
+
+county_url = "https://electionresults.sos.state.mn.us/results/Index?ErsElectionId=115&CountyId=1&DistrictId=&Scenario=Precincts&selectprecincts=1238880"
+page_2 = requests.get(county_url)
+soup_2 = BeautifulSoup(page_2.content, 'html.parser')
+soup_2
+
+# election results for aikin precincts
+
+rows = soup_2.find_all('tr')
+results = []
+
+for row in rows:
+    
+        party_long = row.find(attrs={"class": "hidden-sm hidden-xs col-md-3 text-right"})
+        party_short = row.find(attrs={"class": "hidden-lg hidden-md col-sm-1 col-xs-2 text-right"})
+        candidate = row.find(attrs={"class": "col-md-3 col-sm-3 col-xs-3"})
+        rv = row.find(attrs={"class":"col-md-2 col-sm-2 col-xs-2 text-right"})
+        results.append([party_long, party_short, candidate, rv])
+        aikin_results_df = pd.DataFrame(results)
+
+aikin_results_df
+
+
+results_urls = []
+for x in range(0, 4113):
+    url = 'https://electionresults.sos.state.mn.us/Results/PrecinctListResults/115?countyid=' + str(county_id_list[x]) + '&precincts=' + str(precinct_list[x])
+    results_urls.append(url)
+    
+ # election results for all precincts
+
+
+for url in results_urls:
+    page = requests.get(url)
+    soup_4 = BeautifulSoup(page.content, 'html.parser')
+    
+    rows = soup_4.find_all('tr')
+    
+    results = []
+
+    for row in rows:
+    
+        party_long = row.find(attrs={"class": "hidden-sm hidden-xs col-md-3 text-right"})
+        party_short = row.find(attrs={"class": "hidden-lg hidden-md col-sm-1 col-xs-2 text-right"})
+        candidate = row.find(attrs={"class": "col-md-3 col-sm-3 col-xs-3"})
+        rv = row.find(attrs={"class":"col-md-2 col-sm-2 col-xs-2 text-right"})
+        results.append([party_long, party_short, candidate, rv])
+    
+    results_df = pd.DataFrame(results)
+
+results_df
